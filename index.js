@@ -29,15 +29,13 @@ const BETHESDA_LOGO =
   "https://res.cloudinary.com/towson008/image/upload/v1765341466/tp1aouaicde3zpykntkn.png";
 
 const PICKUP_INFO_HTML = `
-  <div style="margin-top:16px; padding:12px; background:#f1f5f9; border-radius:6px;">
+  <div style="margin-top:16px; padding:12px; background:#003366; border-radius:6px;">
     <p style="margin:0;"><strong>📍 Pickup Location</strong></p>
-    <p style="margin:4px 0;">
-      Bethesda Centre<br />
-      Niagara Region
-    </p>
+    <p style="margin:4px 0;">3310 Schmon Parkway, Thorold, ON, L2V 4Y6</p>
     <p style="margin:8px 0 0;">
       <strong>🕒 Pickup Hours</strong><br />
-      Monday – Friday: 9:00 AM – 4:00 PM
+      Monday – Friday: 9:00 AM – 4:00 PM <br/>
+      Business Days Only
     </p>
   </div>
 `;
@@ -75,24 +73,24 @@ async function sendEmail({ to, subject, html }) {
 function renderBrandedEmail({ title, content, showPickupInfo = false }) {
   return `
     <div style="background:#f8fafc; padding:24px; font-family:Arial, sans-serif;">
-      <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden;">
+      <div style="max-width:600px; margin:auto; border-radius:8px; overflow:hidden;">
         
         <!-- Header -->
-        <div style="background:#0b4ea2; padding:20px; text-align:center;">
+        <div style="background:#003366; padding:20px; text-align:center;">
           <img src="${BETHESDA_LOGO}" alt="Bethesda Toy Lending Library" style="max-width:160px;" />
         </div>
 
         <!-- Body -->
         <div style="padding:24px; color:#1f2937;">
-          <h2 style="color:#0b4ea2;">${title}</h2>
+          <h2 style="color:#003366;">${title}</h2>
           ${content}
           ${showPickupInfo ? PICKUP_INFO_HTML : ""}
         </div>
 
         <!-- Footer -->
-        <div style="background:#0b4ea2; padding:16px; font-size:12px; text-align:center; color:#ffffff;">
+        <div style="background:#003366; padding:16px; font-size:12px; text-align:center; color:#ffffff;">
           <p style="margin:0;">Bethesda Toy Lending Library</p>
-          <p style="margin:4px 0;">Supporting children & families through play</p>
+          <p style="margin:4px 0;">© 2025 Bethesda Services</p>
         </div>
 
       </div>
@@ -127,7 +125,7 @@ app.post("/email/reservation-created", async (req, res) => {
       subject: `Reservation received for "${itemName}"`,
       html: renderBrandedEmail({
         title: "Reservation Received",
-        showPickupInfo: true,
+        showPickupInfo: false,
         content: `
           <p>Hi ${parentName || "there"},</p>
           <p>
@@ -266,7 +264,7 @@ app.post("/email/status-updated", async (req, res) => {
               ? `<p>You requested pickup on <strong>${preferredDay}</strong>.</p>`
               : ""
           }
-          <p>Please bring this email with you when you come.</p>
+          <h4>Note: You will be required to show this confirmationemail with you when you come.</h4>
         `,
       });
     } else if (newStatus === "Returned") {
