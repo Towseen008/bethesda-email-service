@@ -7,7 +7,21 @@ import { Resend } from "resend";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://bethesda-mini-library.onrender.com",
+    ],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// 👇 VERY IMPORTANT: handle preflight
+app.options("*", cors());
+
+
 app.use(express.json());
 
 /* ===============================
@@ -79,7 +93,7 @@ function renderBrandedEmail({ title, content, showPickupInfo = false }) {
         </div>
 
         <!-- Footer -->
-        <div style="background:#f1f5f9; padding:16px; font-size:12px; text-align:center; color:#475569;">
+        <div style="background:#0b4ea2; padding:16px; font-size:12px; text-align:center; color:#ffffff;">
           <p style="margin:0;">Bethesda Toy Lending Library</p>
           <p style="margin:4px 0;">Supporting children & families through play</p>
         </div>
