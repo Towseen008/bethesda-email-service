@@ -12,6 +12,8 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://bethesda-mini-library.onrender.com",
+       "https://bethesdalendinglibrary.com",
+      "https://www.bethesdalendinglibrary.com"
     ],
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
