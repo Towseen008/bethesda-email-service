@@ -31,8 +31,9 @@ const BETHESDA_LOGO =
   "https://res.cloudinary.com/towson008/image/upload/v1765341466/tp1aouaicde3zpykntkn.png";
 
 const PICKUP_INFO_HTML = `
-  <div style="margin-top:16px; padding:12px; background:#003366; border-radius:6px;">
+  <div style="margin-top:16px; padding:12px; background:#D3D3D3; border-radius:6px;">
     <p style="margin:0;"><strong>📍 Pickup Location</strong></p>
+    <p style="margin:4px 0;">Bethesda Niagara Family Center</p>
     <p style="margin:4px 0;">3310 Schmon Parkway, Thorold, ON, L2V 4Y6</p>
     <p style="margin:8px 0 0;">
       <strong>🕒 Pickup Hours</strong><br />
@@ -265,7 +266,7 @@ app.post("/email/status-updated", async (req, res) => {
             preferredDay
               ? `<p>You requested pickup on <strong>${preferredDay}</strong>.</p>`
               : ""
-          }
+          }  
           <h4>Note: You will be required to show this confirmationemail with you when you come.</h4>
         `,
       });
