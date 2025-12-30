@@ -7,19 +7,22 @@ import { Resend } from "resend";
 dotenv.config();
 
 const app = express();
+
+/* ===============================
+   CORS
+================================ */
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
       "https://bethesda-mini-library.onrender.com",
-       "https://bethesdalendinglibrary.com",
-      "https://www.bethesdalendinglibrary.com"
+      "https://bethesdalendinglibrary.com",
+      "https://www.bethesdalendinglibrary.com",
     ],
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 
 app.use(express.json());
 
@@ -128,7 +131,6 @@ app.post("/email/reservation-created", async (req, res) => {
       subject: `Reservation received for "${itemName}"`,
       html: renderBrandedEmail({
         title: "Reservation Received",
-        showPickupInfo: false,
         content: `
           <p>Hi ${parentName || "there"},</p>
           <p>
@@ -242,7 +244,6 @@ app.post("/email/status-updated", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // ❌ Skip On Loan emails
     if (newStatus === "On Loan") {
       return res.json({ skipped: true });
     }
@@ -266,8 +267,8 @@ app.post("/email/status-updated", async (req, res) => {
             preferredDay
               ? `<p>You requested pickup on <strong>${preferredDay}</strong>.</p>`
               : ""
-          }  
-          <h4>Note: You will be required to show this confirmationemail with you when you come.</h4>
+          }
+          <h4>Note: You will be required to show this confirmation email when you come.</h4>
         `,
       });
     } else if (newStatus === "Returned") {
@@ -289,6 +290,60 @@ app.post("/email/status-updated", async (req, res) => {
   } catch (err) {
     console.error("Status email error:", err);
     res.status(500).json({ error: "Failed to send email" });
+  }
+});
+
+/* ======================================================
+   ROUTE: Due Reminder (2 Days Before Expiry)
+====================================================== */
+app.post("/email/due-reminder", async (req, res) => {
+  try {
+    const {
+      parentEmail,
+      parentName,
+      childName,
+      itemName,
+      dueDate,
+    } = req.body;
+
+    if (!parentEmail || !itemName || !dueDate) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    await sendEmail({
+      to: parentEmail,
+      subject: `⏰ Toy Return Reminder – "${itemName}"`,
+      html: renderBrandedEmail({
+        title: "Toy Return Reminder",
+        content: `
+          <p>Hi ${parentName || "there"},</p>
+
+          <p>
+            This is a friendly reminder that the toy
+            <strong>${itemName}</strong>
+            ${childName ? `for ${childName}` : ""}
+            is due for return in <strong>2 days</strong>.
+          </p>
+
+          <p>
+            <strong>📅 Due Date:</strong><br />
+            ${new Date(dueDate).toDateString()}
+          </p>
+
+          <p>
+            If you need more time or have any questions,
+            please feel free to reach out to us.
+          </p>
+
+          <p>Thank you for supporting the Toy Lending Library 💙</p>
+        `,
+      }),
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("Due reminder email error:", err);
+    res.status(500).json({ error: "Failed to send due reminder" });
   }
 });
 
