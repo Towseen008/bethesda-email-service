@@ -55,7 +55,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 async function sendEmail({ to, subject, html }) {
   const from =
     process.env.RESEND_FROM ||
-    "Bethesda Lending Library <no-reply@bethesdalendinglibrary.com>";
+    "Bethesda Lending Library <toylending@bethesdaservices.com>";
 
   const { data, error } = await resend.emails.send({
     from,
