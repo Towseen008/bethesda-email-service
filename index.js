@@ -55,22 +55,21 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 async function sendEmail({ to, subject, html }) {
   const from =
     process.env.RESEND_FROM ||
-    "Bethesda Lending Library <toylending@bethesdaservices.com>";
-
+    "Bethesda Lending Library <no-reply@bethesdalendinglibrary.com>";
   const { data, error } = await resend.emails.send({
     from,
     to,
     subject,
     html,
+    replyTo: process.env.REPLY_TO || "toylending@bethesdaservices.com",
   });
-
   if (error) {
     console.error("Resend error:", error);
     throw error;
   }
-
   return data;
 }
+
 
 /* ===============================
    EMAIL TEMPLATE WRAPPER
