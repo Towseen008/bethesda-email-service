@@ -334,6 +334,13 @@ app.post("/email/due-reminder", async (req, res) => {
             please feel free to reach out to us.
           </p>
 
+          <p>
+           <em>
+              Note: This is an automated reminder. If the toy has already been returned,
+              please disregard this message.
+            </em>
+          </p>
+
           <p>Thank you for supporting the Toy Lending Library 💙</p>
         `,
       }),
@@ -345,6 +352,79 @@ app.post("/email/due-reminder", async (req, res) => {
     res.status(500).json({ error: "Failed to send due reminder" });
   }
 });
+
+/* ======================================================
+   ROUTE: Overdue Notice (3 Days Past Due)
+====================================================== */
+app.post("/email/overdue-3days", async (req, res) => {
+  try {
+    const {
+      parentEmail,
+      parentName,
+      childName,
+      itemName,
+      dueDate,
+      daysPastDue,
+    } = req.body;
+
+    if (!parentEmail || !itemName || !dueDate) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const dueText = new Date(dueDate).toDateString();
+    const daysLate = Number.isFinite(Number(daysPastDue))
+      ? Number(daysPastDue)
+      : null;
+
+    await sendEmail({
+      to: parentEmail,
+      subject: `⚠️ Overdue Reminder – "${itemName}"`,
+      html: renderBrandedEmail({
+        title: "Overdue Toy Return Reminder",
+        content: `
+          <p>Hi ${parentName || "there"},</p>
+
+          <p>
+            This is a gentle reminder that the toy
+            <strong>${itemName}</strong>
+            borrowed from our Toy Lending Library 
+            is now <strong>overdue</strong>.
+          </p>
+
+          <p>
+            <strong>📅 Due Date:</strong><br />
+            ${dueText}
+            ${
+              daysLate !== null
+                ? `<br /><strong>⏳ Days overdue:</strong> ${daysLate} day(s)`
+                : ""
+            }
+          </p>
+
+          <p>
+            If you need a little extra time or have questions, just reply to this email
+            or contact us at <strong>toylending@bethesdaservices.com</strong>.
+          </p>
+
+          <p>
+            <em>
+              Note: This is an automated reminder. If the toy has already been returned,
+              please disregard this message.
+            </em>
+          </p>
+
+          <p>Thank you for supporting the Toy Lending Library 💙</p>
+        `,
+      }),
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("Overdue 3-days email error:", err);
+    res.status(500).json({ error: "Failed to send overdue email" });
+  }
+});
+
 
 /* ===============================
    START SERVER
